@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
 
   app:
-    image: joehe/ocpp-steve-server:3.6.0
+    image: joehe/ocpp-steve-server:3.6.01
     ports:
       - "8180:8180"
     networks:
