@@ -29,6 +29,7 @@ import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.TransactionStatusUpdate;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import de.rwth.idsg.steve.service.WebhookMessage;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.enums.TransactionStopFailedEventActor;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
@@ -449,6 +450,10 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                     .collect(Collectors.toList());
 
         ctx.batchInsert(batch).execute();
+        
+        Long time = System.currentTimeMillis();
+        WebhookMessage message = new WebhookMessage("meter", time, list);
+        WebhookMessage.sendMessage(message);
     }
 
     private void tryInsertingFailed(UpdateTransactionParams p, Exception e) {

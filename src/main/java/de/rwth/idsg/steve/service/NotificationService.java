@@ -72,6 +72,10 @@ public class NotificationService {
 
     @EventListener
     public void ocppStationWebSocketConnected(OcppStationWebSocketConnected notification) {
+        Long time = System.currentTimeMillis();
+        WebhookMessage message = new WebhookMessage("connect", notification.getChargeBoxId(), "ONLINE", time);
+        WebhookMessage.sendMessage(message);
+
         if (isDisabled(OcppStationWebSocketConnected)) {
             return;
         }
@@ -83,6 +87,10 @@ public class NotificationService {
 
     @EventListener
     public void ocppStationWebSocketDisconnected(OcppStationWebSocketDisconnected notification) {
+        Long time = System.currentTimeMillis();
+        WebhookMessage message = new WebhookMessage("connect", notification.getChargeBoxId(), "OFFLINE", time);
+        WebhookMessage.sendMessage(message);
+        
         if (isDisabled(OcppStationWebSocketDisconnected)) {
             return;
         }
@@ -106,6 +114,9 @@ public class NotificationService {
 
     @EventListener
     public void ocppTransactionStarted(OcppTransactionStarted notification) {
+        WebhookMessage message = new WebhookMessage("transaction", notification.getParams().getChargeBoxId(), "STARTED", notification.getParams().getStartTimestamp().getMillis(), notification.getParams().getConnectorId(), notification.getTransactionId(), notification.getParams().getStartMeterValue());
+        WebhookMessage.sendMessage(message);
+        
         if (isDisabled(OcppTransactionStarted)) {
             return;
         }
@@ -117,6 +128,9 @@ public class NotificationService {
 
     @EventListener
     public void ocppTransactionEnded(OcppTransactionEnded notification) {
+        WebhookMessage message = new WebhookMessage("transaction", notification.getParams().getChargeBoxId(), "STOPED", notification.getParams().getStopTimestamp().getMillis(), notification.getParams().getTransactionId(), notification.getParams().getStopMeterValue());
+        WebhookMessage.sendMessage(message);
+
        if (isDisabled(OcppTransactionEnded)) {
             return;
         }
