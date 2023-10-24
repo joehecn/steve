@@ -31,6 +31,7 @@ import javax.crypto.spec.SecretKeySpec;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ocpp.cs._2015._10.MeterValue;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -47,6 +48,25 @@ public class WebhookMessage {
     private int transactionId;
     private String meterValue;
     private List<MeterValue> list;
+    private int connectorPk;
+    private DateTime statusTimestamp;
+    private String status;
+    private String errorCode;
+    private String errorInfo;
+    private String vendorId;
+    private String vendorErrorCode;
+    
+    public WebhookMessage(String type, Long time, int connectorPk, DateTime statusTimestamp, String status, String errorCode, String errorInfo, String vendorId, String vendorErrorCode) {
+        this.type = type;
+        this.time = time;
+        this.connectorPk = connectorPk;
+        this.statusTimestamp = statusTimestamp;
+        this.status = status;
+        this.errorCode = errorCode;
+        this.errorInfo = errorInfo;
+        this.vendorId = vendorId;
+        this.vendorErrorCode = vendorErrorCode;
+    }
     
     public WebhookMessage(String type, String chargeBoxId, String state, Long time) {
         this.type = type;
