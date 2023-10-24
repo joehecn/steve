@@ -23,14 +23,12 @@ services:
     restart: unless-stopped
 
   app:
-    image: joehe/ocpp-steve-server:3.6.05
+    image: joehe/ocpp-steve-server:3.6.06
     ports:
       - "8180:8180"
     networks:
       - default
       - mega-net
-    volumes:
-      - appdata:/code
     restart: unless-stopped
 
 networks:
@@ -41,4 +39,3 @@ networks:
 
 volumes:
   mariadbdata:
-  appdata:
