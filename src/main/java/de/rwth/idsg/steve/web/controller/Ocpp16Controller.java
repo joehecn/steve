@@ -50,6 +50,12 @@ import java.util.Map;
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.R;
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
 
+import org.springframework.web.bind.annotation.RequestHeader;
+import de.rwth.idsg.steve.utils.PropertiesFileLoader;
+import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
+import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.03.2018
@@ -72,6 +78,10 @@ public class Ocpp16Controller extends Ocpp15Controller {
     private static final String CLEAR_CHARGING_PATH = "/ClearChargingProfile";
     private static final String SET_CHARGING_PATH = "/SetChargingProfile";
     private static final String TRIGGER_MESSAGE_PATH = "/TriggerMessage";
+    private static final String REMOTE_START_TX_PATH = "/RemoteStartTransaction";
+    private static final String REMOTE_STOP_TX_PATH = "/RemoteStopTransaction";
+    private static final String INTERNAL_REMOTE_START_TX_PATH = "/InternalRemoteStartTransaction";
+    private static final String INTERNAL_REMOTE_STOP_TX_PATH = "/InternalRemoteStopTransaction";
 
     // -------------------------------------------------------------------------
     // Helpers
@@ -240,5 +250,40 @@ public class Ocpp16Controller extends Ocpp15Controller {
             return getPrefix() + GET_COMPOSITE_PATH;
         }
         return REDIRECT_TASKS_PATH + getClient16().getCompositeSchedule(params);
+    }
+
+    private void checkWebApi(Map<String, String> headers) {
+        PropertiesFileLoader p = new PropertiesFileLoader("main.properties");
+        String API_KEY = p.getOptionalString("webapi.key");
+        String API_VALUE = p.getOptionalString("webapi.value");
+
+        String api_value = headers.get(API_KEY);
+        if (!API_VALUE.equals(api_value)) {
+            throw new SteveException("API Key or API Value is not matched");
+        }
+    }
+
+    @RequestMapping(value = INTERNAL_REMOTE_START_TX_PATH, method = RequestMethod.POST)
+    public String internalPostRemoteStartTx(@Valid @ModelAttribute(PARAMS) RemoteStartTransactionParams params,
+                                    BindingResult result, Model model, @RequestHeader Map<String, String> headers) {
+        this.checkWebApi(headers);
+        if (result.hasErrors()) {
+            setCommonAttributesForTx(model);
+            setActiveUserIdTagList(model);
+            return getPrefix() + REMOTE_START_TX_PATH;
+        }
+        return REDIRECT_TASKS_PATH + getClient16().remoteStartTransaction(params);
+    }
+
+    @RequestMapping(value = INTERNAL_REMOTE_STOP_TX_PATH, method = RequestMethod.POST)
+    public String internalRemoteStopTx(@Valid @ModelAttribute(PARAMS) RemoteStopTransactionParams params,
+                                   BindingResult result, Model model, @RequestHeader Map<String, String> headers) {
+
+        this.checkWebApi(headers);
+        if (result.hasErrors()) {
+            setCommonAttributesForTx(model);
+            return getPrefix() + REMOTE_STOP_TX_PATH;
+        }
+        return REDIRECT_TASKS_PATH + getClient16().remoteStopTransaction(params);
     }
 }

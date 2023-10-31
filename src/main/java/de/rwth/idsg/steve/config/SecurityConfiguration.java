@@ -93,6 +93,8 @@ public class SecurityConfiguration {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().antMatchers(
             "/static/**",
+            "/manager/operations/v1.6/InternalRemoteStartTransaction",
+            "/manager/operations/v1.6/InternalRemoteStopTransaction",
             CONFIG.getCxfMapping() + "/**"
         );
     }
