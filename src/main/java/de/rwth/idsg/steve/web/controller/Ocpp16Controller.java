@@ -257,17 +257,15 @@ public class Ocpp16Controller extends Ocpp15Controller {
         String API_KEY = p.getOptionalString("webapi.key");
         String API_VALUE = p.getOptionalString("webapi.value");
 
-        headers.forEach((key, value) -> {
-            if (key.equals(API_KEY) && !value.equals(API_VALUE)) {
-                throw new SteveException("API Key or API Value is not matched");
-            }
-        });
+        String api_value = headers.get(API_KEY);
+        if (!API_VALUE.equals(api_value)) {
+            throw new SteveException("API Key or API Value is not matched");
+        }
     }
 
     @RequestMapping(value = INTERNAL_REMOTE_START_TX_PATH, method = RequestMethod.POST)
     public String internalPostRemoteStartTx(@Valid @ModelAttribute(PARAMS) RemoteStartTransactionParams params,
                                     BindingResult result, Model model, @RequestHeader Map<String, String> headers) {
-        System.out.println("[DEBUG] location 2");
         this.checkWebApi(headers);
         if (result.hasErrors()) {
             setCommonAttributesForTx(model);
