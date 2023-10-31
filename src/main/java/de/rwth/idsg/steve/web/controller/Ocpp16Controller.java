@@ -55,6 +55,8 @@ import de.rwth.idsg.steve.utils.PropertiesFileLoader;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
+import de.rwth.idsg.steve.service.WebhookMessage;
+import com.google.gson.Gson;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -253,21 +255,62 @@ public class Ocpp16Controller extends Ocpp15Controller {
         return REDIRECT_TASKS_PATH + getClient16().getCompositeSchedule(params);
     }
 
-    private void checkWebApi(Map<String, String> headers) {
+    private Boolean checkWebApi(Map<String, String> headers) {
         PropertiesFileLoader p = new PropertiesFileLoader("main.properties");
         String API_KEY = p.getOptionalString("webapi.key");
         String API_VALUE = p.getOptionalString("webapi.value");
 
         String api_value = headers.get(API_KEY);
-        if (!API_VALUE.equals(api_value)) {
-            throw new SteveException("API Key or API Value is not matched");
+        return API_VALUE.equals(api_value);
+    }
+
+    private static final String STEVE_KEY = "BwfyIXJVQ2agadsb5zkSjr#abdsETy5f27QIhC6b";
+
+    private Boolean securityCheck(String body, Map<String, String> headers) {
+        try {
+            System.out.printf("[DEBUG] body = %s\n", body);
+
+            Long time = Long.parseLong(headers.get("t"));
+
+            String signature = headers.get("signature");
+            String sig = WebhookMessage.getSignature(body, time);
+
+            return sig.equals(signature);
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
         }
     }
 
     @RequestMapping(value = INTERNAL_REMOTE_START_TX_PATH, method = RequestMethod.POST)
     public String internalPostRemoteStartTx(@Valid @ModelAttribute(PARAMS) RemoteStartTransactionParams params,
                                     BindingResult result, Model model, @RequestHeader Map<String, String> headers) {
-        this.checkWebApi(headers);
+        if (!this.checkWebApi(headers)) {
+            throw new SteveException("API Key or API Value is not matched");
+        }
+        /**
+         * The body is a JSON string, and the format must be:
+         * {
+         *     "connectorId": 1,
+         *     "idTag": "idTag",
+         *     "chargePointSelectList": [
+         *         {
+         *             "ocppTransport": "JSON",
+         *             "chargeBoxId": "boxId",
+         *             "endpointAddress": "-"
+         *         }
+         *     ]
+         * }
+         * 
+         * Note:
+         * - If the connectorId is greater the 0, then the first key must be "connectorId".
+         *   Otherwise, the first key is "idTag".
+         */
+        Gson gson = new Gson();
+        String body = gson.toJson(params);
+        if (!this.securityCheck(body, headers)) {
+            throw new SteveException("Form data has been modified");
+        }
         if (result.hasErrors()) {
             setCommonAttributesForTx(model);
             setActiveUserIdTagList(model);
@@ -280,8 +323,27 @@ public class Ocpp16Controller extends Ocpp15Controller {
     @RequestMapping(value = INTERNAL_REMOTE_STOP_TX_PATH, method = RequestMethod.POST)
     public String internalRemoteStopTx(@Valid @ModelAttribute(PARAMS) RemoteStopTransactionParams params,
                                    BindingResult result, Model model, @RequestHeader Map<String, String> headers) {
-
-        this.checkWebApi(headers);
+        if (!this.checkWebApi(headers)) {
+            throw new SteveException("API Key or API Value is not matched");
+        }
+        /**
+         * The body is a JSON string, and the format must be:
+         * {
+         *     "transactionId": 1,
+         *     "chargePointSelectList": [
+         *         {
+         *             "ocppTransport": "JSON",
+         *             "chargeBoxId": "boxId",
+         *             "endpointAddress": "-"
+         *         }
+         *     ]
+         * }
+         */
+        Gson gson = new Gson();
+        String body = gson.toJson(params);
+        if (!this.securityCheck(body, headers)) {
+            throw new SteveException("Form data has been modified");
+        }
         if (result.hasErrors()) {
             setCommonAttributesForTx(model);
             return getPrefix() + REMOTE_STOP_TX_PATH;

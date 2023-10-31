@@ -138,7 +138,7 @@ public class WebhookMessage {
     
     private static final String STEVE_KEY = "BwfyIXJVQ2agadsb5zkSjr#abdsETy5f27QIhC6b";
     
-    private static String getSignature(String body, long t) throws Exception {
+    public static String getSignature(String body, long t) throws Exception {
 
         String text = body + t;
 
