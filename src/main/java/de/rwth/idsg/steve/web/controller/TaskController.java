@@ -47,6 +47,7 @@ public class TaskController {
     // -------------------------------------------------------------------------
 
     private static final String TASK_ID_PATH = "/{taskId}";
+    private static final String INTERNAL_TASK_ID_PATH = "/internal/{taskId}";
     private static final String TASK_DETAILS_PATH = TASK_ID_PATH + "/details/{chargeBoxId}/";
 
     // -------------------------------------------------------------------------
@@ -113,5 +114,13 @@ public class TaskController {
             throw new SteveException("Result not found");
         }
         return result;
+    }
+
+    @RequestMapping(value = INTERNAL_TASK_ID_PATH, method = RequestMethod.GET)
+    public String internalGetTaskDetails(@PathVariable("taskId") Integer taskId, Model model) {
+        CommunicationTask r = taskStore.get(taskId);
+        model.addAttribute("taskId", taskId);
+        model.addAttribute("task", r);
+        return "taskResult";
     }
 }

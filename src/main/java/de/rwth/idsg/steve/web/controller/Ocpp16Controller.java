@@ -82,6 +82,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
     private static final String REMOTE_STOP_TX_PATH = "/RemoteStopTransaction";
     private static final String INTERNAL_REMOTE_START_TX_PATH = "/InternalRemoteStartTransaction";
     private static final String INTERNAL_REMOTE_STOP_TX_PATH = "/InternalRemoteStopTransaction";
+    private static final String REDIRECT_INTERNAL_TASKS_PATH = "redirect:/manager/operations/tasks/internal/";
 
     // -------------------------------------------------------------------------
     // Helpers
@@ -272,7 +273,8 @@ public class Ocpp16Controller extends Ocpp15Controller {
             setActiveUserIdTagList(model);
             return getPrefix() + REMOTE_START_TX_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient16().remoteStartTransaction(params);
+        int taskId = getClient16().remoteStartTransaction(params);
+        return REDIRECT_INTERNAL_TASKS_PATH + taskId;
     }
 
     @RequestMapping(value = INTERNAL_REMOTE_STOP_TX_PATH, method = RequestMethod.POST)
@@ -284,6 +286,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
             setCommonAttributesForTx(model);
             return getPrefix() + REMOTE_STOP_TX_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient16().remoteStopTransaction(params);
+        int taskId = getClient16().remoteStopTransaction(params);
+        return REDIRECT_INTERNAL_TASKS_PATH + taskId;
     }
 }

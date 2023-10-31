@@ -95,6 +95,7 @@ public class SecurityConfiguration {
             "/static/**",
             "/manager/operations/v1.6/InternalRemoteStartTransaction",
             "/manager/operations/v1.6/InternalRemoteStopTransaction",
+            "/manager/operations/tasks/internal/*",
             CONFIG.getCxfMapping() + "/**"
         );
     }
