@@ -32,6 +32,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.util.Map;
+import de.rwth.idsg.steve.utils.PropertiesFileLoader;
+import de.rwth.idsg.steve.SteveException;
+import org.springframework.web.bind.annotation.RequestHeader;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 29.12.2014
@@ -115,9 +120,21 @@ public class TaskController {
         }
         return result;
     }
+    
+    private void checkWebApi(Map<String, String> headers) {
+        PropertiesFileLoader p = new PropertiesFileLoader("main.properties");
+        String API_KEY = p.getOptionalString("webapi.key");
+        String API_VALUE = p.getOptionalString("webapi.value");
+
+        String api_value = headers.get(API_KEY);
+        if (!API_VALUE.equals(api_value)) {
+            throw new SteveException("API Key or API Value is not matched");
+        }
+    }
 
     @RequestMapping(value = INTERNAL_TASK_ID_PATH, method = RequestMethod.GET)
-    public String internalGetTaskDetails(@PathVariable("taskId") Integer taskId, Model model) {
+    public String internalGetTaskDetails(@PathVariable("taskId") Integer taskId, Model model, @RequestHeader Map<String, String> headers) {
+        this.checkWebApi(headers);
         CommunicationTask r = taskStore.get(taskId);
         model.addAttribute("taskId", taskId);
         model.addAttribute("task", r);

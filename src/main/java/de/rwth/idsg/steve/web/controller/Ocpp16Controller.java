@@ -80,9 +80,9 @@ public class Ocpp16Controller extends Ocpp15Controller {
     private static final String TRIGGER_MESSAGE_PATH = "/TriggerMessage";
     private static final String REMOTE_START_TX_PATH = "/RemoteStartTransaction";
     private static final String REMOTE_STOP_TX_PATH = "/RemoteStopTransaction";
-    private static final String INTERNAL_REMOTE_START_TX_PATH = "/InternalRemoteStartTransaction";
-    private static final String INTERNAL_REMOTE_STOP_TX_PATH = "/InternalRemoteStopTransaction";
-    private static final String REDIRECT_INTERNAL_TASKS_PATH = "redirect:/manager/operations/tasks/internal/";
+    private static final String INTERNAL_REMOTE_START_TX_PATH = "/internal/RemoteStartTransaction";
+    private static final String INTERNAL_REMOTE_STOP_TX_PATH = "/internal/RemoteStopTransaction";
+    private static final String INTERNAL_REDIRECT_TASKS_PATH = "redirect:/manager/operations/tasks/internal/";
 
     // -------------------------------------------------------------------------
     // Helpers
@@ -274,7 +274,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
             return getPrefix() + REMOTE_START_TX_PATH;
         }
         int taskId = getClient16().remoteStartTransaction(params);
-        return REDIRECT_INTERNAL_TASKS_PATH + taskId;
+        return INTERNAL_REDIRECT_TASKS_PATH + taskId;
     }
 
     @RequestMapping(value = INTERNAL_REMOTE_STOP_TX_PATH, method = RequestMethod.POST)
@@ -287,6 +287,6 @@ public class Ocpp16Controller extends Ocpp15Controller {
             return getPrefix() + REMOTE_STOP_TX_PATH;
         }
         int taskId = getClient16().remoteStopTransaction(params);
-        return REDIRECT_INTERNAL_TASKS_PATH + taskId;
+        return INTERNAL_REDIRECT_TASKS_PATH + taskId;
     }
 }
