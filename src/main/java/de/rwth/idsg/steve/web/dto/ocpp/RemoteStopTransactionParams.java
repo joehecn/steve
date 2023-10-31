@@ -33,4 +33,8 @@ public class RemoteStopTransactionParams extends SingleChargePointSelect {
 
     @NotNull(message = "Transaction ID is required")
     private Integer transactionId;
+
+    public void setTransactionId(Integer transactionId) {
+        this.transactionId = transactionId;
+    }
 }
