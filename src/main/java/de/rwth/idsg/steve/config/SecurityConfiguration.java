@@ -91,8 +91,11 @@ public class SecurityConfiguration {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
+        System.out.println("[DEBUG] location 1");
         return (web) -> web.ignoring().antMatchers(
             "/static/**",
+            "/manager/operations/v1.6/InternalRemoteStartTransaction",
+            "/manager/operations/v1.6/InternalRemoteStopTransaction",
             CONFIG.getCxfMapping() + "/**"
         );
     }
