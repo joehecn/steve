@@ -52,8 +52,9 @@ public class TaskController {
     // -------------------------------------------------------------------------
 
     private static final String TASK_ID_PATH = "/{taskId}";
-    private static final String INTERNAL_TASK_ID_PATH = "/internal/{taskId}";
     private static final String TASK_DETAILS_PATH = TASK_ID_PATH + "/details/{chargeBoxId}/";
+    private static final String INTERNAL_TASK_ID_PATH = "/internal/{taskId}";
+    private static final String INTERNAL_REDIRECT_RESPONSE_PATH = "redirect:/internal/response/";
 
     // -------------------------------------------------------------------------
     // HTTP methods
@@ -133,7 +134,8 @@ public class TaskController {
     @RequestMapping(value = INTERNAL_TASK_ID_PATH, method = RequestMethod.GET)
     public String internalGetTaskDetails(@PathVariable("taskId") Integer taskId, Model model, @RequestHeader Map<String, String> headers) {
         if (!this.checkWebApi(headers)) {
-            throw new SteveException("API Key or API Value is not matched");
+            // throw new SteveException("API Key or API Value is not matched");
+            return INTERNAL_REDIRECT_RESPONSE_PATH + 403;
         }
         CommunicationTask r = taskStore.get(taskId);
         model.addAttribute("taskId", taskId);
