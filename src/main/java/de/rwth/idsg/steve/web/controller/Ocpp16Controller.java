@@ -84,6 +84,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
     private static final String REMOTE_STOP_TX_PATH = "/RemoteStopTransaction";
     private static final String INTERNAL_REMOTE_START_TX_PATH = "/internal/RemoteStartTransaction";
     private static final String INTERNAL_REMOTE_STOP_TX_PATH = "/internal/RemoteStopTransaction";
+    private static final String INTERNAL_REDIRECT_RESPONSE_PATH = "redirect:/internal/response/";
     private static final String INTERNAL_REDIRECT_TASKS_PATH = "redirect:/manager/operations/tasks/internal/";
 
     // -------------------------------------------------------------------------
@@ -255,7 +256,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
         return REDIRECT_TASKS_PATH + getClient16().getCompositeSchedule(params);
     }
 
-    private Boolean checkWebApi(Map<String, String> headers) {
+    private Boolean webApiCheck(Map<String, String> headers) {
         PropertiesFileLoader p = new PropertiesFileLoader("main.properties");
         String API_KEY = p.getOptionalString("webapi.key");
         String API_VALUE = p.getOptionalString("webapi.value");
@@ -266,27 +267,30 @@ public class Ocpp16Controller extends Ocpp15Controller {
 
     private static final String STEVE_KEY = "BwfyIXJVQ2agadsb5zkSjr#abdsETy5f27QIhC6b";
 
-    private Boolean securityCheck(String body, Map<String, String> headers) {
+    private Integer securityCheck(String body, Map<String, String> headers) {
         try {
-            System.out.printf("[DEBUG] body = %s\n", body);
-
             Long time = Long.parseLong(headers.get("t"));
 
             String signature = headers.get("signature");
             String sig = WebhookMessage.getSignature(body, time);
 
-            return sig.equals(signature);
+            if (sig.equals(signature)) {
+                return 200;
+            } else {
+                return 403;
+            }
         } catch (Exception e) {
             System.out.println(e);
-            return false;
+            return 500;
         }
     }
 
     @RequestMapping(value = INTERNAL_REMOTE_START_TX_PATH, method = RequestMethod.POST)
     public String internalPostRemoteStartTx(@Valid @ModelAttribute(PARAMS) RemoteStartTransactionParams params,
                                     BindingResult result, Model model, @RequestHeader Map<String, String> headers) {
-        if (!this.checkWebApi(headers)) {
-            throw new SteveException("API Key or API Value is not matched");
+        if (!this.webApiCheck(headers)) {
+            System.out.println("API Key or API Value is not matched");
+            return INTERNAL_REDIRECT_RESPONSE_PATH + 403;
         }
         /**
          * The body is a JSON string, and the format must be:
@@ -308,8 +312,10 @@ public class Ocpp16Controller extends Ocpp15Controller {
          */
         Gson gson = new Gson();
         String body = gson.toJson(params);
-        if (!this.securityCheck(body, headers)) {
-            throw new SteveException("Form data has been modified");
+        Integer status = this.securityCheck(body, headers);
+        if (status != 200) {
+            System.out.println("Form data has been modified");
+            return INTERNAL_REDIRECT_RESPONSE_PATH + status;
         }
         if (result.hasErrors()) {
             setCommonAttributesForTx(model);
@@ -323,8 +329,9 @@ public class Ocpp16Controller extends Ocpp15Controller {
     @RequestMapping(value = INTERNAL_REMOTE_STOP_TX_PATH, method = RequestMethod.POST)
     public String internalRemoteStopTx(@Valid @ModelAttribute(PARAMS) RemoteStopTransactionParams params,
                                    BindingResult result, Model model, @RequestHeader Map<String, String> headers) {
-        if (!this.checkWebApi(headers)) {
-            throw new SteveException("API Key or API Value is not matched");
+        if (!this.webApiCheck(headers)) {
+            System.out.println("API Key or API Value is not matched");
+            return INTERNAL_REDIRECT_RESPONSE_PATH + 403;
         }
         /**
          * The body is a JSON string, and the format must be:
@@ -341,8 +348,10 @@ public class Ocpp16Controller extends Ocpp15Controller {
          */
         Gson gson = new Gson();
         String body = gson.toJson(params);
-        if (!this.securityCheck(body, headers)) {
-            throw new SteveException("Form data has been modified");
+        Integer status = this.securityCheck(body, headers);
+        if (status != 200) {
+            // throw new SteveException("Form data has been modified");
+            return INTERNAL_REDIRECT_RESPONSE_PATH + status;
         }
         if (result.hasErrors()) {
             setCommonAttributesForTx(model);
