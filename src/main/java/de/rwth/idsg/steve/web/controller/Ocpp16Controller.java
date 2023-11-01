@@ -256,7 +256,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
         return REDIRECT_TASKS_PATH + getClient16().getCompositeSchedule(params);
     }
 
-    private Boolean checkWebApi(Map<String, String> headers) {
+    private Boolean webApiCheck(Map<String, String> headers) {
         PropertiesFileLoader p = new PropertiesFileLoader("main.properties");
         String API_KEY = p.getOptionalString("webapi.key");
         String API_VALUE = p.getOptionalString("webapi.value");
@@ -269,8 +269,6 @@ public class Ocpp16Controller extends Ocpp15Controller {
 
     private Integer securityCheck(String body, Map<String, String> headers) {
         try {
-            System.out.printf("[DEBUG] body = %s\n", body);
-
             Long time = Long.parseLong(headers.get("t"));
 
             String signature = headers.get("signature");
@@ -290,8 +288,8 @@ public class Ocpp16Controller extends Ocpp15Controller {
     @RequestMapping(value = INTERNAL_REMOTE_START_TX_PATH, method = RequestMethod.POST)
     public String internalPostRemoteStartTx(@Valid @ModelAttribute(PARAMS) RemoteStartTransactionParams params,
                                     BindingResult result, Model model, @RequestHeader Map<String, String> headers) {
-        if (!this.checkWebApi(headers)) {
-            // throw new SteveException("API Key or API Value is not matched");
+        if (!this.webApiCheck(headers)) {
+            System.out.println("API Key or API Value is not matched");
             return INTERNAL_REDIRECT_RESPONSE_PATH + 403;
         }
         /**
@@ -316,7 +314,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
         String body = gson.toJson(params);
         Integer status = this.securityCheck(body, headers);
         if (status != 200) {
-            // throw new SteveException("Form data has been modified");
+            System.out.println("Form data has been modified");
             return INTERNAL_REDIRECT_RESPONSE_PATH + status;
         }
         if (result.hasErrors()) {
@@ -331,8 +329,8 @@ public class Ocpp16Controller extends Ocpp15Controller {
     @RequestMapping(value = INTERNAL_REMOTE_STOP_TX_PATH, method = RequestMethod.POST)
     public String internalRemoteStopTx(@Valid @ModelAttribute(PARAMS) RemoteStopTransactionParams params,
                                    BindingResult result, Model model, @RequestHeader Map<String, String> headers) {
-        if (!this.checkWebApi(headers)) {
-            // throw new SteveException("API Key or API Value is not matched");
+        if (!this.webApiCheck(headers)) {
+            System.out.println("API Key or API Value is not matched");
             return INTERNAL_REDIRECT_RESPONSE_PATH + 403;
         }
         /**
