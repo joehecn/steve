@@ -265,18 +265,21 @@ public class Ocpp16Controller extends Ocpp15Controller {
         return API_VALUE.equals(api_value);
     }
 
-    private static final String STEVE_KEY = "BwfyIXJVQ2agadsb5zkSjr#abdsETy5f27QIhC6b";
-
     private Integer securityCheck(String body, Map<String, String> headers) {
         try {
+            Long curTime = System.currentTimeMillis();
             Long time = Long.parseLong(headers.get("t"));
+            if (curTime - time > 3000) {
+                System.out.printf("Expired request time: %d\n", time);
+                return 400;
+            }
 
             String signature = headers.get("signature");
             String sig = WebhookMessage.getSignature(body, time);
-
             if (sig.equals(signature)) {
                 return 200;
             } else {
+                System.out.println("Form data has been modified");
                 return 403;
             }
         } catch (Exception e) {
@@ -314,7 +317,6 @@ public class Ocpp16Controller extends Ocpp15Controller {
         String body = gson.toJson(params);
         Integer status = this.securityCheck(body, headers);
         if (status != 200) {
-            System.out.println("Form data has been modified");
             return INTERNAL_REDIRECT_RESPONSE_PATH + status;
         }
         if (result.hasErrors()) {
@@ -350,7 +352,6 @@ public class Ocpp16Controller extends Ocpp15Controller {
         String body = gson.toJson(params);
         Integer status = this.securityCheck(body, headers);
         if (status != 200) {
-            // throw new SteveException("Form data has been modified");
             return INTERNAL_REDIRECT_RESPONSE_PATH + status;
         }
         if (result.hasErrors()) {
