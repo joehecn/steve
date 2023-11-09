@@ -105,7 +105,15 @@ public class WebhookMessage {
         this.transactionId = -1;
         this.list = list;
     }
-    
+
+    public WebhookMessage(String type, Long time, List<MeterValue> list,int connectorPk, int transactionId) {
+        this.type = type;
+        this.time = time;
+        this.connectorPk = connectorPk;
+        this.transactionId = transactionId;
+        this.list = list;
+    }
+
     public static void sendMessage(WebhookMessage message) {
         try {
             PropertiesFileLoader p = new PropertiesFileLoader("main.properties");

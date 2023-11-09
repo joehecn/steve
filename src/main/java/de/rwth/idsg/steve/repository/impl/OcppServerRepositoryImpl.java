@@ -479,7 +479,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         ctx.batchInsert(batch).execute();
 
         Long time = System.currentTimeMillis();
-        WebhookMessage message = new WebhookMessage("meter", time, list);
+        WebhookMessage message = new WebhookMessage("meter", time, list, connectorPk, transactionId);
         WebhookMessage.sendMessage(message);
     }
 
