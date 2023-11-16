@@ -350,6 +350,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
          */
         Gson gson = new Gson();
         String body = gson.toJson(params);
+        System.out.printf("[DEBUG] request body = %s\n", body);
         Integer status = this.securityCheck(body, headers);
         if (status != 200) {
             return INTERNAL_REDIRECT_RESPONSE_PATH + status;
@@ -359,6 +360,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
             return getPrefix() + REMOTE_STOP_TX_PATH;
         }
         int taskId = getClient16().remoteStopTransaction(params);
+        System.out.printf("[DEBUG] Task created: %d\n", taskId);
         return INTERNAL_REDIRECT_TASKS_PATH + taskId;
     }
 }
