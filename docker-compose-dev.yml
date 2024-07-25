@@ -22,41 +22,44 @@ services:
   #     - mariadbdata:/var/lib/mysql
   #   restart: unless-stopped
 
-  # Use mysql 8 for the database
   mysqldb:
     image: mysql:8.0
+    container_name: steve-db
+    tty: true
     ports:
-      - 33306:3306
+      - 13306:3306
     networks:
       - default
-      - mega-net
     environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_ROOT_PASSWORD: "1231231"
       MYSQL_DATABASE: stevedb
       MYSQL_USER: steve
       MYSQL_PASSWORD: YouCantGuessThisIs@Mimi
     volumes:
+      - ./docker/mysql:/etc/mysql/conf.d
       - mysqldata:/var/lib/mysql
-    restart: unless-stopped
 
   app:
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
     image: joehe/ocpp-steve-server:3.6.06
+    tty: true
+    # image: steve-app
+    container_name: steve-app
     ports:
-      - 8180:8180
+      - 18180:8180
     networks:
       - default
-      - mega-net
-    restart: unless-stopped
-    # Service link for the default config
+    volumes:
+      - ./:/code
     links:
       - mysqldb:mariadb
 
 networks:
   default:
     name: steve-docker_default
-  mega-net:
-    name: mega-net
 
 volumes:
-  mariadbdata:
+  # mariadbdata:
   mysqldata:
