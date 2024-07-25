@@ -40,12 +40,11 @@ services:
       - mysqldata:/var/lib/mysql
 
   app:
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile
-    image: joehe/ocpp-steve-server:3.6.06
+    build:
+      context: .
+      dockerfile: Dockerfile
     tty: true
-    # image: steve-app
+    image: steve-app
     container_name: steve-app
     ports:
       - 18180:8180

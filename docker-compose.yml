@@ -9,7 +9,7 @@ services:
   #   # MariaDB 10.4.
   #   image: mariadb:10.4.30
   #   ports:
-  #     - 33306:3306
+  #     - 33307:3306
   #   networks:
   #     - default
   #     - mega-net
@@ -36,6 +36,7 @@ services:
       MYSQL_USER: steve
       MYSQL_PASSWORD: YouCantGuessThisIs@Mimi
     volumes:
+      - ./docker/mysql:/etc/mysql/conf.d
       - mysqldata:/var/lib/mysql
     restart: unless-stopped
 
