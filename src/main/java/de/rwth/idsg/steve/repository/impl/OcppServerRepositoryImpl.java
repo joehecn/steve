@@ -59,6 +59,9 @@ import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
 import static jooq.steve.db.tables.TransactionStop.TRANSACTION_STOP;
 import static jooq.steve.db.tables.TransactionStopFailed.TRANSACTION_STOP_FAILED;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * This class has methods for database access that are used by the OCPP service.
  *
@@ -77,6 +80,8 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     private ReservationRepository reservationRepository;
 
     private final Striped<Lock> transactionTableLocks = Striped.lock(16);
+
+    ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Override
     public void updateChargebox(UpdateChargeboxParams p) {
@@ -167,13 +172,16 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                     .set(CONNECTOR_STATUS.VENDOR_ERROR_CODE, p.getVendorErrorCode())
                     .execute();
 
-            Long time = System.currentTimeMillis();
-            WebhookMessage message = new WebhookMessage("status", time, connectorPk, p.getTimestamp(), p.getStatus(),
-                    p.getErrorCode(), p.getErrorInfo(), p.getVendorId(), p.getVendorErrorCode());
-            WebhookMessage.sendMessage(message);
+            executorService.submit(() -> {
+                Long time = System.currentTimeMillis();
+                WebhookMessage message = new WebhookMessage("status", time, connectorPk, p.getTimestamp(), p.getStatus(),
+                        p.getErrorCode(), p.getErrorInfo(), p.getVendorId(), p.getVendorErrorCode());
+                WebhookMessage.sendMessage(message);
+            });
 
             log.debug("Stored a new connector status for {}/{}.", p.getChargeBoxId(), p.getConnectorId());
         });
+        // DO SOMETHING
     }
 
     @Override
