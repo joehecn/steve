@@ -23,4 +23,3 @@ COPY . /code
 CMD dockerize -wait tcp://mariadb:3306 -timeout 60s && \
 	./mvnw clean package -Pdocker -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" && \
 	java -jar target/steve.jar
-

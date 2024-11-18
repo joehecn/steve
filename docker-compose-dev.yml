@@ -1,64 +1,39 @@
-version: "3.0"
+name: "steve"
 
 services:
-  # mariadb:
-  #   # Pinning MariaDB to point release 10.4.30 works around the issues with the
-  #   # database migrations seen with 10.4.31 in issue #1212.
-  #   #
-  #   # TODO: Get database migrations to work with the latest point releases of
-  #   # MariaDB 10.4.
-  #   image: mariadb:10.4.30
-  #   ports:
-  #     - 33306:3306
-  #   networks:
-  #     - default
-  #     - mega-net
-  #   environment:
-  #     MYSQL_RANDOM_ROOT_PASSWORD: "yes"
-  #     MYSQL_DATABASE: stevedb
-  #     MYSQL_USER: steve
-  #     MYSQL_PASSWORD: YouCantGuessThisIs@Mimi
-  #   volumes:
-  #     - mariadbdata:/var/lib/mysql
-  #   restart: unless-stopped
-
-  mysqldb:
-    image: mysql:8.0
-    container_name: steve-db
+  fusquare-mysql:
+    image: mysql:8.2
+    container_name: fusquare-mysql
     tty: true
     ports:
       - 13306:3306
     networks:
-      - default
+      - fusquare-net
     environment:
-      MYSQL_ROOT_PASSWORD: "1231231"
+      MYSQL_ROOT_PASSWORD: "123456"
       MYSQL_DATABASE: stevedb
       MYSQL_USER: steve
       MYSQL_PASSWORD: YouCantGuessThisIs@Mimi
     volumes:
       - ./docker/mysql:/etc/mysql/conf.d
-      - mysqldata:/var/lib/mysql
+      - fusquare-mysql:/var/lib/mysql
 
-  app:
+  fusquare-steve:
     build:
       context: .
       dockerfile: Dockerfile
     tty: true
-    image: steve-app
-    container_name: steve-app
+    image: fusquare-steve
+    container_name: fusquare-steve
     ports:
       - 18180:8180
     networks:
-      - default
-    volumes:
-      - ./:/code
+      - fusquare-net
     links:
-      - mysqldb:mariadb
+      - fusquare-mysql:mariadb
 
 networks:
-  default:
-    name: steve-docker_default
+  fusquare-net:
 
 volumes:
-  # mariadbdata:
-  mysqldata:
+  fusquare-mysql:
