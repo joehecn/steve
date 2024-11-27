@@ -114,7 +114,16 @@ public class NotificationService {
 
     @EventListener
     public void ocppTransactionStarted(OcppTransactionStarted notification) {
-        WebhookMessage message = new WebhookMessage("transaction", notification.getParams().getChargeBoxId(), "STARTED", notification.getParams().getStartTimestamp().getMillis(), notification.getParams().getConnectorId(), notification.getTransactionId(), notification.getParams().getStartMeterValue());
+        WebhookMessage message = new WebhookMessage(
+            "transaction",
+            notification.getParams().getChargeBoxId(),
+            "STARTED",
+            notification.getParams().getStartTimestamp().getMillis(),
+            notification.getParams().getConnectorId(),
+            notification.getTransactionId(),
+            notification.getParams().getStartMeterValue(),
+            notification.getParams().getIdTag()
+        );
         WebhookMessage.sendMessage(message);
         
         if (isDisabled(OcppTransactionStarted)) {
@@ -128,7 +137,15 @@ public class NotificationService {
 
     @EventListener
     public void ocppTransactionEnded(OcppTransactionEnded notification) {
-        WebhookMessage message = new WebhookMessage("transaction", notification.getParams().getChargeBoxId(), "STOPED", notification.getParams().getStopTimestamp().getMillis(), notification.getParams().getTransactionId(), notification.getParams().getStopMeterValue());
+        WebhookMessage message = new WebhookMessage(
+            "transaction",
+            notification.getParams().getChargeBoxId(),
+            "STOPED",
+            notification.getParams().getStopTimestamp().getMillis(),
+            notification.getParams().getTransactionId(),
+            notification.getParams().getStopMeterValue(),
+            notification.getParams().getStopReason()
+        );
         WebhookMessage.sendMessage(message);
 
        if (isDisabled(OcppTransactionEnded)) {

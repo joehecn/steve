@@ -55,6 +55,8 @@ public class WebhookMessage {
     private String errorInfo;
     private String vendorId;
     private String vendorErrorCode;
+    private String idTag;
+    private String stopReason;
     
     public WebhookMessage(String type, Long time, int connectorPk, DateTime statusTimestamp, String status, String errorCode, String errorInfo, String vendorId, String vendorErrorCode) {
         this.type = type;
@@ -78,7 +80,7 @@ public class WebhookMessage {
         this.transactionId = -1;
     }
     
-    public WebhookMessage(String type, String chargeBoxId, String state, Long time, int connectorId, int transactionId, String meterValue) {
+    public WebhookMessage(String type, String chargeBoxId, String state, Long time, int connectorId, int transactionId, String meterValue, String idTag) {
         this.type = type;
         this.chargeBoxId = chargeBoxId;
         this.state = state;
@@ -86,9 +88,10 @@ public class WebhookMessage {
         this.connectorId = connectorId;
         this.transactionId = transactionId;
         this.meterValue = meterValue;
+        this.idTag = idTag;
     }
     
-    public WebhookMessage(String type, String chargeBoxId, String state, Long time, int transactionId, String meterValue) {
+    public WebhookMessage(String type, String chargeBoxId, String state, Long time, int transactionId, String meterValue, String stopReason) {
         this.type = type;
         this.chargeBoxId = chargeBoxId;
         this.state = state;
@@ -96,6 +99,10 @@ public class WebhookMessage {
         this.connectorId = -1;
         this.transactionId = transactionId;
         this.meterValue = meterValue;
+        this.stopReason = stopReason;
+
+        System.out.println("[DEBUG]");
+        System.out.println(stopReason);
     }
     
     public WebhookMessage(String type, Long time, List<MeterValue> list) {
