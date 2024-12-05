@@ -100,9 +100,6 @@ public class WebhookMessage {
         this.transactionId = transactionId;
         this.meterValue = meterValue;
         this.stopReason = stopReason;
-
-        System.out.println("[DEBUG]");
-        System.out.println(stopReason);
     }
     
     public WebhookMessage(String type, Long time, List<MeterValue> list) {
@@ -128,9 +125,6 @@ public class WebhookMessage {
             
             Gson gson = new Gson();
             String json = gson.toJson(message);
-
-            System.out.println(json);
-            
             String sig = getSignature(json, message.time);
 
             HttpClient client = HttpClient.newHttpClient();
