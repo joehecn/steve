@@ -122,6 +122,9 @@ public class WebhookMessage {
         try {
             PropertiesFileLoader p = new PropertiesFileLoader("main.properties");
             String serviceUrl = p.getString("webhook");
+
+            String msg = "[DEBUG] Server URL: " + serviceUrl;
+            System.out.println(msg);
             
             Gson gson = new Gson();
             String json = gson.toJson(message);
