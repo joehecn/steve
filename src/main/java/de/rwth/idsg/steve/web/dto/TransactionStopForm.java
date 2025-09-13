@@ -16,42 +16,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.dto.ocpp;
+package de.rwth.idsg.steve.web.dto;
 
-import de.rwth.idsg.steve.web.validation.IdTag;
+import io.swagger.annotations.ApiModelProperty;
+
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
+import lombok.ToString;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 01.01.2015
+ * @since 31.08.2015
  */
 @Getter
-public class RemoteStartTransactionParams extends SingleChargePointSelect {
+@Setter
+@ToString(callSuper = true)
+public class TransactionStopForm {
+    // Internal database Id
+    @ApiModelProperty(value = "Database primary key of the transaction")
+    private Integer transactionId;
 
-    @Min(value = 0, message = "Connector ID must be at least {value}")
-    private Integer connectorId;
+    // Charge Point ID
+    @ApiModelProperty(value = "Charge Point ID")
+    private String chargePointId;
 
-    @NotBlank(message = "User ID Tag is required")
-    @IdTag
-    @Setter private String idTag;
-
-    /**
-     * Not for a specific connector, when frontend sends the value 0.
-     * This corresponds to not to include the connector id parameter in OCPP request.
-     */
-    public void setConnectorId(Integer connectorId) {
-        if (connectorId == 0) {
-            this.connectorId = null;
-        } else {
-            this.connectorId = connectorId;
-        }
+    public Integer getTransactionId() {
+        return this.transactionId;
     }
-
-    public void setIdTag(String idTag) {
-        this.idTag = idTag;
+    public void setTransactionId(Integer transactionId) {
+        this.transactionId = transactionId;
+    }
+    public String getChargePointId() {
+        return this.chargePointId;
+    }
+    public void setChargePointId(String chargePointId) {
+        this.chargePointId = chargePointId;
     }
 }
